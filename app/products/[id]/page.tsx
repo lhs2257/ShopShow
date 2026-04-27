@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 
 export const revalidate = 60;
 
-export default async function ProductPage(props: PageProps<"/products/[id]">) {
+export default async function ProductPage(props: {
+  params: Promise<{ id: string }>
+}) {
   const { id } = await props.params;
   const productId = Number(id);
 
