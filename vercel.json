@@ -1,0 +1,6 @@
+{
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://ijmomdrrydhitngwwias.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqbW9tZHJyeWRoaXRuZ3d3aWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyOTg5NDAsImV4cCI6MjA5Mjg3NDk0MH0.bmPIjrL30zxWyqBG6mPgy3_Ry4QrQI8K8_wPGRzKyqs"
+  }
+}
