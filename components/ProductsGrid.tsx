@@ -45,11 +45,10 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
     }}>
       {/* 헤더 */}
       <header style={{
-        padding: "18px 16px 14px",
         borderBottom: "1px solid #ececec",
         background: "#faf9f7",
         position: "sticky", top: 0, zIndex: 10,
-      }}>
+      }} className="px-4 pt-5 pb-4 md:px-10 md:pt-7 md:pb-5">
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           marginBottom: 12,
@@ -59,7 +58,7 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
             오늘의 큐레이션 {products.length}
           </div>
         </div>
-        <div style={{ fontSize: 13, color: "#5d574b", lineHeight: 1.5, marginBottom: 14 }}>
+        <div style={{ color: "#5d574b", lineHeight: 1.5, marginBottom: 14 }} className="text-sm md:text-base">
           유튜브에서 한 번쯤 봤던 그 상품, 여기 다 모아뒀어요.
         </div>
 
@@ -117,7 +116,7 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
       </header>
 
       {/* 상품 그리드 */}
-      <main style={{ padding: "18px 16px 40px" }}>
+      <main className="px-4 pt-5 pb-10 md:px-10 md:pt-7">
         {filtered.length === 0 ? (
           <div style={{ padding: "60px 20px", textAlign: "center", color: "#7a7468" }}>
             <div style={{
@@ -144,11 +143,7 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
             </button>
           </div>
         ) : (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 14,
-          }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
             {filtered.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
