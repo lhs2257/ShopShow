@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>쇼쇼 — Shopping Shorts UI</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { font-family: Pretendard, ui-sans-serif, system-ui, -apple-system, sans-serif; background: #f0eee9; }
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="products.jsx"></script>
+<script type="text/babel" src="logo.jsx"></script>
+<script type="text/babel" src="product-thumb.jsx"></script>
+<script type="text/babel" src="home-page.jsx"></script>
+<script type="text/babel" src="detail-page.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentColor": "#C9A87C",
+  "showCardBorder": true,
+  "cardRadius": 10,
+  "labelStyle": "thumb-corner",
+  "fontWeight": "regular"
+}/*EDITMODE-END*/;
+
+// Frame: 모바일 또는 데스크탑 캔버스. iframe 같은 격리는 안하고
+// 오버플로우만 자른다. 내부에서 sticky를 쓰려면 frame 안의 wrapper가
+// 직접 스크롤되도록 만든다.
+function Frame({ width, height, children }) {
+  return (
+    <div style={{
+      width, height,
+      background: "#fff",
+      overflow: "hidden",
+      position: "relative",
+      borderRadius: 6,
+      isolation:"isolate",
+    }}>
+      <div style={{
+        width:"100%", height:"100%",
+        overflowY:"auto",
+        overflowX:"hidden",
+        scrollbarWidth: "thin",
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  // 4가지 화면 상태를 캔버스에 동시에 보여준다
+  const [mobileSelected, setMobileSelected] = React.useState(PRODUCTS[4]);   // No.05
+  const [desktopSelected, setDesktopSelected] = React.useState(PRODUCTS[10]); // No.11
+
+  // accent를 CSS에 풀어서 placeholder 영역에서도 쓸 수 있게
+  React.useEffect(() => {
+    document.documentElement.style.setProperty("--shosho-accent", t.accentColor);
+  }, [t.accentColor]);
+
+  return (
+    <>
+      <DesignCanvas>
+        <DCSection
+          id="mobile"
+          title="모바일 — 메인 우선"
+          subtitle="쇼츠 시청자 대상 주 디바이스. 2열 그리드, sticky 헤더, 하단 고정 CTA."
+        >
+          <DCArtboard id="m-home" label="01 · 메인 (모바일)" width={390} height={780}>
+            <Frame width={390} height={780}>
+              <HomePage
+                accent={t.accentColor}
+                mobile={true}
+                products={PRODUCTS}
+                onOpenProduct={(p) => setMobileSelected(p)}
+              />
+            </Frame>
+          </DCArtboard>
+          <DCArtboard id="m-detail" label="02 · 상세 (모바일)" width={390} height={780}>
+            <Frame width={390} height={780}>
+              <DetailPage
+                product={mobileSelected}
+                accent={t.accentColor}
+                mobile={true}
+                onBack={() => {}}
+              />
+            </Frame>
+          </DCArtboard>
+          <DCArtboard id="m-search" label="03 · 검색 (No.15)" width={390} height={780}>
+            <Frame width={390} height={780}>
+              <HomePageWithQuery query="No.15" accent={t.accentColor} mobile={true} />
+            </Frame>
+          </DCArtboard>
+          <DCArtboard id="m-empty" label="04 · 빈 검색결과" width={390} height={780}>
+            <Frame width={390} height={780}>
+              <HomePageWithQuery query="없는상품명" accent={t.accentColor} mobile={true} />
+            </Frame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="desktop"
+          title="데스크탑 — 4열 그리드"
+          subtitle="같은 시스템, 4열 카드와 좌우 여백을 활용한 카탈로그 레이아웃."
+        >
+          <DCArtboard id="d-home" label="05 · 메인 (데스크탑)" width={1280} height={820}>
+            <Frame width={1280} height={820}>
+              <HomePage
+                accent={t.accentColor}
+                mobile={false}
+                products={PRODUCTS}
+                onOpenProduct={(p) => setDesktopSelected(p)}
+              />
+            </Frame>
+          </DCArtboard>
+          <DCArtboard id="d-detail" label="06 · 상세 (데스크탑)" width={1280} height={820}>
+            <Frame width={1280} height={820}>
+              <DetailPage
+                product={desktopSelected}
+                accent={t.accentColor}
+                mobile={false}
+                onBack={() => {}}
+              />
+            </Frame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="system"
+          title="디자인 시스템"
+          subtitle="컬러, 타이포, 카드 컴포넌트 명세."
+        >
+          <DCArtboard id="s-palette" label="07 · 컬러 팔레트" width={520} height={420}>
+            <Palette accent={t.accentColor} />
+          </DCArtboard>
+          <DCArtboard id="s-type" label="08 · 타이포그래피" width={520} height={420}>
+            <Typography />
+          </DCArtboard>
+          <DCArtboard id="s-card" label="09 · 카드 컴포넌트" width={520} height={420}>
+            <CardSpec accent={t.accentColor} />
+          </DCArtboard>
+        </DCSection>
+
+        <DCPostIt x={40} y={40} width={240}>
+          쇼쇼 — Shopping Shorts UI · v1{"\n"}
+          {"\n"}
+          포인트 컬러: 베이지/뉴트럴(#C9A87C){"\n"}
+          폰트: Pretendard{"\n"}
+          모바일 우선 + 반응형 4열{"\n"}
+          {"\n"}
+          오른쪽 Tweaks로 컬러/카드 보더/라벨 스타일 토글 가능.
+        </DCPostIt>
+      </DesignCanvas>
+
+      <TweaksPanel>
+        <TweakSection label="브랜드" />
+        <TweakColor label="포인트 컬러" value={t.accentColor}
+          onChange={(v) => setTweak('accentColor', v)} />
+        <TweakSection label="카드" />
+        <TweakToggle label="카드 보더" value={t.showCardBorder}
+          onChange={(v) => setTweak('showCardBorder', v)} />
+        <TweakSlider label="모서리 반경" value={t.cardRadius} min={0} max={20} unit="px"
+          onChange={(v) => setTweak('cardRadius', v)} />
+        <TweakSection label="No. 라벨" />
+        <TweakRadio label="위치" value={t.labelStyle}
+          options={['thumb-corner','overlay-big','inline']}
+          onChange={(v) => setTweak('labelStyle', v)} />
+      </TweaksPanel>
+    </>
+  );
+}
+
+// 검색 상태가 미리 적용된 메인 — 검색 결과/빈 결과 보여주기 위한 헬퍼
+function HomePageWithQuery({ query, accent, mobile }) {
+  const Wrapped = React.useMemo(() => {
+    return function W() {
+      return <HomePage accent={accent} mobile={mobile} products={PRODUCTS} onOpenProduct={() => {}} />;
+    };
+  }, [accent, mobile]);
+  // useEffect로 input에 query 채워넣기
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      const root = ref.current;
+      if (!root) return;
+      const input = root.querySelector('input[placeholder]');
+      if (input) {
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        setter.call(input, query);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }, 30);
+    return () => clearTimeout(t);
+  }, [query]);
+  return <div ref={ref} style={{height:"100%"}}><Wrapped/></div>;
+}
+
+// ── 디자인 시스템 카드들 ────────────────────────────────────
+function Palette({ accent }) {
+  const swatches = [
+    { name:"Bg / Cream",   hex:"#faf9f7", text:"#1a1a1a" },
+    { name:"Surface",      hex:"#ffffff", text:"#1a1a1a", border:true },
+    { name:"Card BG warm", hex:"#f5f1ea", text:"#1a1a1a" },
+    { name:"Border",       hex:"#ececec", text:"#1a1a1a" },
+    { name:"Ink / Text",   hex:"#1a1a1a", text:"#fff"    },
+    { name:"Muted",        hex:"#7a7468", text:"#fff"    },
+    { name:"Accent",       hex:accent,    text:"#fff", isAccent:true },
+  ];
+  return (
+    <div style={{padding:24, fontFamily:"Pretendard, system-ui, sans-serif", color:"#1a1a1a", height:"100%", boxSizing:"border-box", background:"#faf9f7"}}>
+      <div style={{fontSize:11, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#9a8e72", marginBottom:6}}>Color</div>
+      <div style={{fontSize:18, fontWeight:700, marginBottom:18}}>Warm Neutrals + Beige</div>
+      <div style={{display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:10}}>
+        {swatches.map(s => (
+          <div key={s.name} style={{
+            background: s.hex, color: s.text,
+            border: s.border ? "1px solid #ececec" : "none",
+            borderRadius: 8, padding: "12px 14px",
+            display:"flex", flexDirection:"column", gap: 2,
+            minHeight: 70,
+          }}>
+            <div style={{fontSize:12, fontWeight:600}}>{s.name}{s.isAccent && " ★"}</div>
+            <div style={{fontSize:11, fontFamily:'"SF Mono",ui-monospace,monospace', opacity:0.75}}>{s.hex}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Typography() {
+  return (
+    <div style={{padding:24, fontFamily:"Pretendard, system-ui, sans-serif", color:"#1a1a1a", height:"100%", boxSizing:"border-box", background:"#faf9f7"}}>
+      <div style={{fontSize:11, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#9a8e72", marginBottom:6}}>Type</div>
+      <div style={{fontSize:18, fontWeight:700, marginBottom:18}}>Pretendard</div>
+      <div style={{display:"flex", flexDirection:"column", gap:14}}>
+        <Row label="H1 · 28 / 700"  size={28} weight={700} text="유튜브에서 본 그 상품" />
+        <Row label="H2 · 22 / 700"  size={22} weight={700} text="매트리스 방수 커버 Q" />
+        <Row label="Body · 15 / 500" size={15} weight={500} text="혼자 사는 집에 딱. 접으면 5cm로 얇아져요." />
+        <Row label="Caption · 12 / 600" size={12} weight={600} text="No.15 · 주방" mono />
+        <Row label="Tiny · 11 / 500"  size={11} weight={500} text="쿠팡에서 보기 →" />
+      </div>
+    </div>
+  );
+}
+function Row({ label, size, weight, text, mono }) {
+  return (
+    <div>
+      <div style={{fontSize:10.5, color:"#9a9387", marginBottom:3, fontFamily:'"SF Mono", monospace'}}>{label}</div>
+      <div style={{fontSize:size, fontWeight:weight, lineHeight:1.3, letterSpacing:"-0.01em", fontFamily: mono ? '"SF Mono", monospace' : "inherit"}}>{text}</div>
+    </div>
+  );
+}
+
+function CardSpec({ accent }) {
+  return (
+    <div style={{padding:24, fontFamily:"Pretendard, system-ui, sans-serif", color:"#1a1a1a", height:"100%", boxSizing:"border-box", background:"#faf9f7"}}>
+      <div style={{fontSize:11, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#9a8e72", marginBottom:6}}>Component</div>
+      <div style={{fontSize:18, fontWeight:700, marginBottom:18}}>Product Card</div>
+      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, alignItems:"start"}}>
+        <ProductCard product={PRODUCTS[4]} accent={accent} mobile={true} onClick={() => {}} />
+        <ul style={{
+          margin:0, padding:0, listStyle:"none",
+          fontSize:12, lineHeight:1.6, color:"#3d3a32",
+          display:"flex", flexDirection:"column", gap:7,
+        }}>
+          <Spec k="썸네일" v="1:1, 카테고리 톤 placeholder" />
+          <Spec k="No. 라벨" v="좌상단, mono / 흰 칩" />
+          <Spec k="제목" v="14.5px / 600, 2줄 클램프" />
+          <Spec k="메타" v="카테고리 + ♡ 조회수" />
+          <Spec k="CTA" v="‘쿠팡에서 보기 →’ inline" />
+          <Spec k="호버" v="-3px translateY + 그림자" />
+        </ul>
+      </div>
+    </div>
+  );
+}
+function Spec({ k, v }) {
+  return (
+    <li style={{display:"flex", gap:10}}>
+      <div style={{width:60, color:"#9a9387", flexShrink:0, fontFamily:'"SF Mono", monospace', fontSize:11}}>{k}</div>
+      <div>{v}</div>
+    </li>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>

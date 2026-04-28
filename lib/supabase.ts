@@ -11,6 +11,7 @@ export type Product = {
   product_name: string | null
   thumbnail_url: string | null
   coupang_url: string | null
+  my_youtube_url: string | null
   view_count: number
   is_visible: boolean
   synced_at: string
